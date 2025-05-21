@@ -40,26 +40,26 @@ MILESTONES & TASKS
    - [X] Verify working skeleton with basic command in command palette.
 
 2. TOGGLE COMMAND AND STATE
-   - [ ] Implement a command called `vibecommit.toggle`.
-   - [ ] Store ON/OFF state in `workspaceState` or `globalState`.
-   - [ ] Show toggle state in status bar.
-   - [ ] Optionally remember toggle state across sessions.
+   - [X] Implement a command called `vibecommit.toggle`.
+   - [X] Store ON/OFF state in `workspaceState` or `globalState`.
+   - [X] Show toggle state in status bar.
+   - [X] Optionally remember toggle state across sessions.
 
 3. COMMIT ON SAVE
-   - [ ] Listen for `workspace.onDidSaveTextDocument`.
-   - [ ] If toggle is ON:
+   - [X] Listen for `workspace.onDidSaveTextDocument`.
+   - [X] If toggle is ON:
          - Run `git add <filename>`
          - Run `git commit -m "<generated or default message>"`
-   - [ ] If toggle is OFF, do nothing.
+   - [X] If toggle is OFF, do nothing.
 
 4. COMMIT MESSAGE GENERATION
    - [ ] If `vibecommit.useLLM = true`, generate message via Copilot's API that allows us to use LLMs for free (this is a new feature of VS Code and Copilot.).
-   - [ ] Otherwise, fallback to:
+   - [X] Otherwise, fallback to:
          "chore(vibe): <timestamp> updated <filename>"
-   - [ ] Allow user to configure commit prefix, timestamp inclusion, etc. Provide defaults for all use configurable settings.
+   - [X] Allow user to configure commit prefix, timestamp inclusion, etc. Provide defaults for all use configurable settings.
 
 5. SETTINGS AND CONFIGURATION
-   - [ ] Add config options to `package.json`:
+   - [X] Add config options to `package.json`:
          - vibecommit.useLLM (boolean)
          - vibecommit.messagePrefix (string)
          - vibecommit.includeTimestamp (boolean) (defaults to true)
