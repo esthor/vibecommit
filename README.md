@@ -1,16 +1,12 @@
 # vibecommit README
 
-This is the README for your extension "vibecommit". After writing up a brief description, we recommend including the following sections.
+VibeCommit automatically commits files whenever you save them. Use the `Toggle VibeCommit` command to turn auto-commits on or off. When enabled, each save runs `git add` and `git commit` with a simple message.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+* Toggle auto-commit mode with the `vibecommit.toggle` command.
+* Status bar indicator shows whether auto-commit is enabled.
+* Commit message prefix and timestamp are configurable.
 
 ## Requirements
 
