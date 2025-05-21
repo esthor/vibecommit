@@ -1,0 +1,98 @@
+=======================
+PROJECT OVERVIEW
+=======================
+
+Vibe coding got you lost in a sea of slop, aching because it worked just a few changes ago? Don't worry, VibeCommit's got your back, fam.
+
+VibeCommit is a Visual Studio Code extension that automates Git commits during coding sessions, particularly when code is being written or modified by LLMs (e.g., GitHub Copilot). The extension includes a manual toggle to enable or disable auto-commit mode. This eliminates the need for detecting LLM vs human edits, while giving the user precise control over commit automation.
+
+The core functionality is to listen for file save events and trigger Git commits with a meaningful or default message. When the toggle is OFF, no commit automation occurs. Optionally, commit messages can be generated via an LLM API.
+
+=======================
+KEY FEATURES
+=======================
+
+- Manual toggle to enable or disable automatic commits.
+- Auto-commit triggered on file save when enabled.
+- Sensible, human-readable dynamic batching of commits and checkpoints.
+- Optionally use LLM to generate commit messages.
+- Status bar indicator showing ON/OFF state.
+- User configuration options for message style and behavior.
+
+
+=======================
+ASSUMPTIONS & CONSTRAINTS
+=======================
+
+- Git is installed and available in the PATH.
+- VS Code APIs (particularly `workspace.onDidSaveTextDocument`) will be used.
+- Integration with GitHub Copilot or other LLMs is optional.
+- No automatic differentiation between LLM- and human-generated edits.
+- Toggle state should be remembered per session (optionally across sessions).
+
+=======================
+MILESTONES & TASKS
+=======================
+
+1. EXTENSION SCAFFOLDING
+   - [X] Use `yo code` to scaffold a new extension called `vibecommit`.
+   - [X] Choose TypeScript and VS Code extension (not web extension).
+   - [X] Verify working skeleton with basic command in command palette.
+
+2. TOGGLE COMMAND AND STATE
+   - [ ] Implement a command called `vibecommit.toggle`.
+   - [ ] Store ON/OFF state in `workspaceState` or `globalState`.
+   - [ ] Show toggle state in status bar.
+   - [ ] Optionally remember toggle state across sessions.
+
+3. COMMIT ON SAVE
+   - [ ] Listen for `workspace.onDidSaveTextDocument`.
+   - [ ] If toggle is ON:
+         - Run `git add <filename>`
+         - Run `git commit -m "<generated or default message>"`
+   - [ ] If toggle is OFF, do nothing.
+
+4. COMMIT MESSAGE GENERATION
+   - [ ] If `vibecommit.useLLM = true`, generate message via Copilot's API that allows us to use LLMs for free (this is a new feature of VS Code and Copilot.).
+   - [ ] Otherwise, fallback to:
+         "chore(vibe): <timestamp> updated <filename>"
+   - [ ] Allow user to configure commit prefix, timestamp inclusion, etc. Provide defaults for all use configurable settings.
+
+5. SETTINGS AND CONFIGURATION
+   - [ ] Add config options to `package.json`:
+         - vibecommit.useLLM (boolean)
+         - vibecommit.messagePrefix (string)
+         - vibecommit.includeTimestamp (boolean) (defaults to true)
+
+6. TESTING
+   - [ ] Confirm that:
+         - Toggle ON = commits on save
+         - Toggle OFF = no commits
+         - Messages are generated properly
+   - [ ] Test cases for missing Git, non-repo folders, etc.
+   - [ ] Log actions to output window.
+   - [ ] Handle Git errors (e.g., missing Git, non-repo, commit failures) and notify user via notifications or Output channel.
+
+7. PACKAGE & PUBLISH
+   - [ ] Add README with examples and usage.
+   - [ ] Include icon/logo if desired.
+   - [ ] Publish to VS Code Marketplace.
+
+=======================
+FUTURE ENHANCEMENTS (OPTIONAL BACKLOG)
+=======================
+
+- Batch commits within a debounce window.
+- Support checkpoints with one-click rollbacks.
+- Detect Copilot changes explicitly. (Bonus: Detect other coding agents changes, like Cursor, Windsurf, Cline, RooCode, Claude Code, etc.)
+- Annotate commit metadata with model version.
+- Add history playback / timeline viewer.
+
+=======================
+NOTES FOR AGENTS
+=======================
+
+- The user intends to toggle auto-commit mode manually. No need for Copilot or LLM detection heuristics.
+- Keep initial implementation simple. No scheduling, batching, or AI messages needed at first.
+- Use the VS Code Extension API docs and Git integration patterns.
+- Do not include telemetry or tracking without opt-in.
