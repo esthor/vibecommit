@@ -7,6 +7,7 @@ import { promisify } from 'util';
 const execAsync = promisify(exec);
 
 let statusBarItem: vscode.StatusBarItem;
+const outputChannel = vscode.window.createOutputChannel('VibeCommit');
 
 function updateStatusBar(enabled: boolean) {
     if (!statusBarItem) {
@@ -15,23 +16,50 @@ function updateStatusBar(enabled: boolean) {
         statusBarItem.show();
     }
     statusBarItem.text = enabled ? 'VibeCommit: ON' : 'VibeCommit: OFF';
+    outputChannel.appendLine(`status bar updated: ${enabled ? 'ON' : 'OFF'}`);
+}
+
+export async function generateCommitMessage(document: vscode.TextDocument): Promise<string> {
+    const config = vscode.workspace.getConfiguration('vibecommit');
+    const useLLM = config.get<boolean>('useLLM', false);
+    const messagePrefix = config.get<string>('messagePrefix', 'chore(vibe)');
+    const includeTimestamp = config.get<boolean>('includeTimestamp', true);
+    if (useLLM) {
+        const commands = await vscode.commands.getCommands(true);
+        const llmCmd = commands.find((c) =>
+            c === 'github.copilot.generateCommitMessage' ||
+            c === 'github.copilotChat.generateCommitMessage'
+        );
+        if (llmCmd) {
+            try {
+                const llmMessage = await vscode.commands.executeCommand<string>(llmCmd);
+                if (llmMessage) {
+                    outputChannel.appendLine('Commit message generated via LLM');
+                    return llmMessage;
+                }
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : String(err);
+                vscode.window.showWarningMessage(`LLM generation failed: ${msg}`);
+            }
+        } else {
+            outputChannel.appendLine('LLM commit message command not found');
+        }
+    }
+    const timestamp = new Date().toISOString();
+    const fileName = vscode.workspace.asRelativePath(document.uri);
+    return `${messagePrefix}: ${includeTimestamp ? timestamp + ' ' : ''}updated ${fileName}`;
 }
 
 async function commitFile(document: vscode.TextDocument) {
-    const config = vscode.workspace.getConfiguration('vibecommit');
-    const messagePrefix = config.get<string>('messagePrefix', 'chore(vibe)');
-    const includeTimestamp = config.get<boolean>('includeTimestamp', true);
-    // Placeholder for future LLM integration
-    const timestamp = new Date().toISOString();
-    const fileName = vscode.workspace.asRelativePath(document.uri);
-    const message = `${messagePrefix}: ${includeTimestamp ? timestamp + ' ' : ''}updated ${fileName}`;
-
+    const message = await generateCommitMessage(document);
     try {
         await execAsync(`git add "${document.fileName}"`);
         await execAsync(`git commit -m "${message.replace(/"/g, '\\"')}"`);
+        outputChannel.appendLine(`Committed ${document.fileName}`);
     } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         vscode.window.showErrorMessage(`Git commit failed: ${msg}`);
+        outputChannel.appendLine(`Git commit failed: ${msg}`);
     }
 }
 
